@@ -33,16 +33,18 @@ def append_torrent(r):
            }
 
 class Categories(Resource):
+    categories = ['all']
     def get(self):
-        categories = ['all']
+        if len(self.categories) > 1:
+            return self.categories
         # main categories
         cats = [a for a in dir(CATEGORIES) if not a.startswith('__')]
         # sub categories except ALL
         for c in [s for s in cats if not s == 'ALL']:
             subcat = getattr(CATEGORIES, c)
             for sub in [s for s in dir(subcat) if not s.startswith('__')]:
-                categories.append('{0}:{1}'.format(c.lower(), sub.lower()))
-        return categories
+                self.categories.append('{0}:{1}'.format(c.lower(), sub.lower()))
+        return self.categories
 
 class Top(Resource):
     def get(self, category):
