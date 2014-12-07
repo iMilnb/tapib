@@ -13,13 +13,23 @@ Start the webservice:
 
 Query the service:
 
-    $ curl coruscant:5001/s/all/debian
+    $ curl localhost:5001/s/all/debian
 
 Possible filters are:
 
-* categories: `service:5001/cats`
-* top: `service:5001/top/applications:unix`
-* search: `service:5001/s/all/free software`
+* categories: `localhost:5001/cats`
+* top: `localhost:5001/top/applications:unix`
+* search: `localhost:5001/s/all/free software`
+* search and sort: `localhost:5001/s/video:movies/public domain/size:asc`
+
+Sort filters are composed of `name`, `uploaded`, `size`, `seeders`, `leechers`, `uploader` and `type`. Each filter must be associated with a `des` (decreasing)
+or `asc` (increasing) parameter. For example:
+
+    $ curl "localhost:5001/s/audio:music/public domain/leechers:des"
+
+will display results for `"public domain"` in the `audio:music` section by leechers ordering the search from the most to the lesser.  
+Default order is `seeders:des`
+
 
 Requirements
 ============

@@ -15,12 +15,21 @@ api = Api(app)
 
 t = TPB(tpburl)
 
-def abort_if_no_category(category):
+# main subject and default value
+constants = {
+            'cat': [CATEGORIES, CATEGORIES.ALL],
+            'order': [ORDERS, ORDERS.SEEDERS.DES]
+        }
+
+def abort_on_mistake(var, filtr):
     try:
-        cat, sub = category.split(':')
-        return getattr(getattr(CATEGORIES, cat.upper()), sub.upper())
+        if not ':' in filtr:
+            # return default value
+            return constants[var][1]
+        k, v = filtr.split(':')
+        return getattr(getattr(constants[var][0], k.upper()), v.upper())
     except AttributeError:
-        abort(404, message="category {} doesn't exist".format(category))
+        abort(404, message='unkown value')
 
 def append_torrent(r):
     return {
@@ -49,25 +58,32 @@ class Categories(Resource):
 class Top(Resource):
     def get(self, category):
         top = []
-        cat = abort_if_no_category(category)
+        cat = abort_on_mistake('cat', category)
         for r in t.top().category(cat):
             top.append(append_torrent(r))
         return top
 
 class Search(Resource):
-    def get(self, category, sstr):
+    def get(self, category='all', sstr=None, sort=ORDERS.SEEDERS.DES):
         search = []
-        if category == 'all':
-            cat = CATEGORIES.ALL
-        else:
-            cat = abort_if_no_category(category)
-        for r in t.search(sstr).category(cat).order(ORDERS.SEEDERS.DES):
+
+        cat = abort_on_mistake('cat', category)
+
+        for r in t.search(sstr).category(cat).order(sort):
             search.append(append_torrent(r))
         return search
+
+class SortSearch(Resource):
+    def get(self, category='all', sstr=None, sort='seeders:des'):
+        s = abort_on_mistake('order', sort)
+        print(s)
+        return Search.get(self, category=category, sstr=sstr, sort=s)
+
 
 api.add_resource(Categories, '/cats')
 api.add_resource(Top, '/top/<string:category>')
 api.add_resource(Search, '/s/<string:category>/<string:sstr>')
+api.add_resource(SortSearch, '/s/<string:category>/<string:sstr>/<string:sort>')
 
 if __name__ == '__main__':
         app.run(debug=True, host='0.0.0.0', port=5001)
