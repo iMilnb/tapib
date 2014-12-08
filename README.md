@@ -4,6 +4,20 @@ What's this?
 `tapib` is a trivial _RESTful_ interface to _TPB_, it permits to search content
 with a simple _REST_ syntax.
 
+Docker
+======
+
+## Using a existing image
+
+    $ docker run -d -p 5001:5001 --name tapib humboldtux/tapib
+
+## Building and using your own image
+
+    $ git clone git@github.com:iMilnb/tapib.git
+    $ cd tapib
+    $ docker build -t myusername/tapib .
+    $ docker run -d -p 5001:5001 --name tapib myusername/tapib
+
 Usage
 =====
 
